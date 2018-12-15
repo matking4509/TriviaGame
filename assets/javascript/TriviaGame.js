@@ -11,14 +11,12 @@ var gameConfig= {
     counter : 5,
     totalQ : 10
 }
-// var curScore = correctQ / totalQ * 100;
+
 var counterInt;
-var qTimeOut;
-var correctQ = 0;
-var countQ = 0;
+var correctQ;
+var countQ;
 var wins = 0;
 var questionId = 0;
-var currentCounter = gameConfig.counter;
 
 
 var questionLibraryObj = {
@@ -35,29 +33,31 @@ var questionLibraryObj = {
 };
 var currentQuestionObj = {};
 
-// debugPrint("Test Colour: ", questionLibrary.decoyA[1][1]);
-
 function gameStart() {
+    countQ = 0;
+    correctQ = 0;
+    nextQ();
+}
+
+function nextQ() {
     writeScore();
     writeRecord();
     pickQuestion();
     writeQandA();
-    // startTimer();
-    // qTimeOut = setTimeout(nextQ,gameConfig.counter * 1000);
 }
     
-function writeScore () {
+function writeScore() {
     if (countQ == 0) {
-        $("#currentScore").html("Current Score: 100%");
+        $("#currentScore").html("<b>Current Score: </b>100%");
     } else {
-        $("#currentScore").html("Current Score: " + (Math.floor(correctQ / countQ * 100)) + "%");
+        $("#currentScore").html("<b>Current Score: </b>" + (Math.floor(correctQ / countQ * 100)) + "%");
     }
     debugPrint("Score Formula: ", correctQ + " / " + countQ + " * 100");
 
 }
 
 function writeRecord() {
-    $("#winLossRecord").html("Wining Games: " + wins);
+    $("#winLossRecord").html("<b>Wining Games: </b>" + wins);
 }
 
 function pickQuestion() {
@@ -65,7 +65,6 @@ function pickQuestion() {
     questionId = Math.floor(Math.random()*questionLibraryObj.question.length);
     spliceIndex = Math.floor(Math.random()*4);
     //Build Current Question Information
-    // currentQuestionObj["decoy"] = shuffle(questionLibraryObj.decoyA[questionId]);
     currentQuestionObj["decoy"] = [];
     for (var i = 0; i < questionLibraryObj.decoyA[questionId].length; i++) {
         currentQuestionObj.decoy.push(questionLibraryObj.decoyA[questionId][i]);
@@ -76,28 +75,35 @@ function pickQuestion() {
 
     //Debug Elements
     debugPrint("currentQuestionObk", currentQuestionObj);
-    debugPrint("Question Index: " + questionId);
-    debugPrint("Splice Index: " + spliceIndex);
-    debugPrint(questionLibraryObj.decoyA[questionId]);   
+    debugPrint("Question Index: ", questionId);
+    debugPrint("Splice Index: ", spliceIndex);
+    debugPrint("Decory Questions: ", questionLibraryObj.decoyA[questionId]);   
 }
 
 function writeQandA() {
+    debugPrint("Question Count / Limit", countQ + " / " + gameConfig.totalQ);
     if (countQ == gameConfig.totalQ + 1) {
         gameOver();
     } else {
+        $("#game").replaceWith("<div id=\"game\" class=\"row mt-2 mb-2 border\"><div id=\"questions\" class=\"col-6 text-center align-self-center\"></div><div id=\"answers\" class=\"col-6 text-center\"></div><div>"); //reinstate "crystals row"
     var qCard = $("<div>");
-        qCard.addClass("card text-center");
+        qCard.addClass("card text-center textStyle");
         qCard.attr("id","questionCard");
         qCard.appendTo("#questions");
-        $("#questionCard").html("<p>" + questionLibraryObj.question[questionId] + "</p>");
-    
+        $("#questionCard").html("<p class=\"my-auto\">" + questionLibraryObj.question[questionId] + "</p>");
     var aCard = $("<div>");
-        aCard.addClass("card text-center");
+        aCard.addClass("card text-center textStyle");
         aCard.attr("id","answerCard");
         aCard.appendTo("#answers");
         $("#answerCard").html("");
         for (var i = 0; i < 4; i++) {
-            $("#answerCard").append("<p id=" + i + " class=\"answerBtn\">" + currentQuestionObj.decoy[i] + "</p>");
+            // $("#answerCard").append("<p id=" + i + " class=\"answerBtn\">" + currentQuestionObj.decoy[i] + "</p>");
+            var aBtn = $("<button>");
+                aBtn.attr("id",i);
+                aBtn.attr("width","50%");
+                aBtn.addClass("answerBtn");
+                aBtn.text(currentQuestionObj.decoy[i]);
+                aBtn.appendTo("#answerCard");
         }
     checkAnswer();
     startTimer();
@@ -126,23 +132,27 @@ function resetTimer() {
 
 function countDown() {
     currentCounter--;
-    $("#timerDiv").html("Time Left: " + currentCounter + " Seconds");
+    $("#timerDiv").html("<b>Time Left: </b>" + currentCounter + "<b> Seconds</b>");
     if (currentCounter == 0) {
         currentCounter = gameConfig.counter;
         nextQ();
     }
 }
 
-function nextQ() {
-    writeScore();
-    writeRecord();
-    pickQuestion();
-    writeQandA();
-}
-
 function gameOver() {
     clearInterval(counterInt);
+    if ((Math.floor(correctQ / countQ * 100)) > 50) {
+       wins++;
+    }
+    writeRecord();
     $("#game").html("Game Over");
+    var restartGameBtn = $("<button>");
+        restartGameBtn.text("New Game");
+        restartGameBtn.attr("id","newGameBtn");
+        restartGameBtn.appendTo("#game");
+    $("#newGameBtn").click(function (){
+        gameStart();
+    });
 }
 
 function shuffle(array) {
@@ -159,4 +169,3 @@ function shuffle(array) {
     }
     return array;
 };
-// counterInt = setInterval(stopwatch.count, 1000);

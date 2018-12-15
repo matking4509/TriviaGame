@@ -6,17 +6,27 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css?family=Wire+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <meta charset="UTF-8">
-    <title>Trivia Game!</title>
+    <title>Generic Trivia!</title>
     <style>
+    .card {
+        border: none;
+    }
+    .textStyle {
+        font-family: 'Helvetica Neue', Helvetica, sans-serif;
+    }
+    .triviaBanner {
+        color: white;
+        font-size : 100px;
+    }
     </style>
   </head>
 
   <body>
     <div class="container">
         <div class="jumbotron text-center mt-2" style="background-image: url(assets/images/15505.jpg); background-size: 100%;">
-            Trivia
+            <p class="triviaBanner">Generic Trivia</p>
         </div>
         <div id="scoreboard" class="row">
             <div id="currentScore" class="col-4 text-center">
@@ -30,21 +40,16 @@
             </div>    
         </div>
         <div id="game" class="row">
-            <div id="questions" class="col-6 text-center">
-                Questions!
+            <div id="questions" class="col-6 text-center textStyle">
             </div>
-            <div id="answers" class="col-6 text-center">
-                Answers!
+            <div id="answers" class="col-6 text-center textStyle">
             </div>
 
         </div>
     </div>
     <script type="text/javascript" src="assets/javascript/TriviaGame.js"></script>    
     <script>
-        // startGame();
-        // startTimer();
         gameStart();
-        
     </script>
   
   </body>

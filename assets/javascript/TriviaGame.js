@@ -1,5 +1,5 @@
 // Toggle console.logs for debugging, and write debug function.
-var debugLogs = true;
+var debugLogs = false;
 var debugPrint = function(label, output) {
     if (debugLogs) {
         console.log("dbg - ", label, output);
@@ -8,7 +8,7 @@ var debugPrint = function(label, output) {
 
 // Game Configuration Variables
 var gameConfig= {
-    counter : 5,
+    counter : 6,
     totalQ : 10
 }
 
@@ -17,18 +17,41 @@ var correctQ;
 var countQ;
 var wins = 0;
 var questionId = 0;
-
+var state;
 
 var questionLibraryObj = {
-    question : [ "What is 1 + 1?",
-                 "What colour is an Orange?",
-                 "How much wood could a woodchuck chuck, if a woodchuch could chuck wood?"],
-    correctA : [ "2", 
-                 "Orange",
-                 "1 Bucket" ],
-      decoyA : [ [ "3","4","1" ], 
-                 ["red","blue","green"],
-                 ["14 Buckets", "3 Buckets", "42 Buckets", "6 Buckets"]
+    question : [ "Acrophobia is the fear of ____?",
+                 "Achluophobia is the fear of ____?",
+                 "Barophobia is the fear of ____?",
+                 "Chronomentrophobia is the fear of ____?",
+                 "Domatophobia is the fear of ____?",
+                 "Dystychiphobia is the fear of ____?",
+                 "Elurophobia is the fear of ____?",
+                 "Ephebiphobia is the fear of ____?",
+                 "Gamophobia is the fear of ____?",
+                 "Genuphobia is the fear of ____?"
+                ],
+    correctA : [ "heights", 
+                 "darkness",
+                 "gravity",
+                 "clocks",
+                 "houses",
+                 "accidents",
+                 "cats",
+                 "teenagers",
+                 "marriage",
+                 "knees"
+                ],
+      decoyA : [ ["caves","large insects","Tom Cruise"], 
+                 ["germs","rubber","cruise ships"],
+                 ["pressure","storms","sailboats"],
+                 ["very old men","beards","changing colours"],
+                 ["domes","round objects","tents"],
+                 ["80's Hair Bands","sticks and stones","reptiles"],
+                 ["pick-up trucks","pyramids","bears"],
+                 ["people named Pheobe","carrots","getting carsick"],
+                 ["video games","board games","chewing gum"],
+                 ["genitics","family members","public pools"]
                ]
 };
 var currentQuestionObj = {};
@@ -64,6 +87,7 @@ function pickQuestion() {
     countQ++;
     questionId = Math.floor(Math.random()*questionLibraryObj.question.length);
     spliceIndex = Math.floor(Math.random()*4);
+    debugPrint("Questions ID", questionId);
     //Build Current Question Information
     currentQuestionObj["decoy"] = [];
     for (var i = 0; i < questionLibraryObj.decoyA[questionId].length; i++) {
@@ -113,9 +137,21 @@ function writeQandA() {
 function checkAnswer() {
     $(".answerBtn").click(function() {
         if (this.id == currentQuestionObj.spliceIndex) {
-            console.log("You are right!");
             correctQ++;
-            nextQ();
+            alert("You are right!");
+            $("#game").replaceWith("<div id=\"game\" class=\"row mt-2 mb-2 border\"></div>");
+            writeScore();
+            resetTimer();
+            $("#timerDiv").html("<b>Time Left: </b> Please Wait");
+            setTimeout(nextQ, 2000);
+        } else {
+            
+            alert("Incorrect!  The correct answer was \"" + currentQuestionObj.decoy[spliceIndex] + "\".");
+            $("#game").replaceWith("<div id=\"game\" class=\"row mt-2 mb-2 border\"></div>");
+            writeScore();
+            resetTimer();
+            $("#timerDiv").html("<b>Time Left: </b> Please Wait");
+            setTimeout(nextQ, 2000);
         }
     });
 }
@@ -135,21 +171,33 @@ function countDown() {
     $("#timerDiv").html("<b>Time Left: </b>" + currentCounter + "<b> Seconds</b>");
     if (currentCounter == 0) {
         currentCounter = gameConfig.counter;
-        nextQ();
+        alert("Times Up!  The correct answer was \"" + currentQuestionObj.decoy[spliceIndex] + "\".");
+        resetTimer();
+        $("#timerDiv").html("<b>Time Left: </b> Loading Next Question...");
+        setTimeout(nextQ, 2000);
     }
 }
 
 function gameOver() {
+    
+    $("#timerDiv").html("<b>Time Left: </b>Game Over");
     clearInterval(counterInt);
     if ((Math.floor(correctQ / countQ * 100)) > 50) {
        wins++;
+       state="Win!";
+    } else {
+        state="Lose!";
     }
     writeRecord();
-    $("#game").html("Game Over");
+    $("#game").html("<div id=\"gameover-div\" class=\"col text-center\"><p><h1>Game Over!</h1></p><p>You " + state + "</p><p>You answered " + correctQ + " correct out of " + gameConfig.totalQ + " for " + (Math.floor(correctQ / gameConfig.totalQ * 100)) + "%.</p></div></div>");
+    var buttonDiv = $("<div>");
+        buttonDiv.attr("id","button-div");
+        buttonDiv.addClass("col align-self-center")
+        buttonDiv.appendTo("#gameover-div");
     var restartGameBtn = $("<button>");
         restartGameBtn.text("New Game");
         restartGameBtn.attr("id","newGameBtn");
-        restartGameBtn.appendTo("#game");
+        restartGameBtn.appendTo("#gameover-div");
     $("#newGameBtn").click(function (){
         gameStart();
     });
